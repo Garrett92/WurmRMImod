@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,7 +79,7 @@ public class CustomMethods {
 			throw new AccessException("Access denied.");
 		}
 	}
-	
+
 	public static Map<Long, String[]> CPgetSteamDBInfo(String intraServerPassword) {
 		connectSteamDB();
 		String sql = "SELECT * FROM STEAMIDS;";
@@ -163,6 +164,26 @@ public class CustomMethods {
 			} 
 			return toReturn;
 		} catch(Exception e) {
+			return null; 
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static Map<Long, String[]> CPgetAllGuardTowers(String intraServerPassword, ArrayList list) {
+		try {
+			validateIntraServerPassword(intraServerPassword);
+			Map<Long, String[]> toReturn = new HashMap<Long, String[]>();
+			for (int i = 0; i < list.size(); i++) {
+				final Item gt = (Item) list.get(i);
+				String name = "";
+				if (gt.getLastOwnerId() > 0) {
+					name = PlayerInfoFactory.getPlayerInfoWithWurmId(gt.getLastOwnerId()).getName();
+				}
+				toReturn.put(gt.getWurmId(), new String[] {Integer.toString(gt.getTileX()), Integer.toString(gt.getTileY()), Long.toString(gt.getLastOwnerId()), name, Float.toString(gt.getCurrentQualityLevel()), Float.toString(gt.getDamage())});
+			}
+			return toReturn;
+		} catch(Exception e) {
+			System.out.println(e.getMessage());
 			return null; 
 		}
 	}
